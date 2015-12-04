@@ -21,15 +21,58 @@
                 right:20px;
                 text-align:center;
                 pointer-events: none;
+            }
+
+            .boxed {
                 background-color: white;
                 box-shadow: 5px 5px 2px #999999;
                 border: 1px solid black;
                 border-radius: 10px;
             }
 
+            #aboutBox {
+                position:absolute;
+                top:50px;
+                left: 25%;
+                width: 50%;
+                padding-left: 20px;
+                padding-right: 20px;
+            }
         </style>
     </head>
     <body>
+        <div id="aboutBox" class="boxed">
+<a href="https://github.com/MaPePeR/jsColorblindSimulator"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"></a>
+<h1>jsColorblindSimulator</h1>
+<h2>Usage</h2>
+<p>Use the file selector in the top left or <strong>drag and drop</strong> an image here to load it. You will then be able to choose between different simulations for different kinds of color-blindness.</p>
+<p>All processing is done locally in your web browser. The image will not leave your computer.</p>
+<p>The displayed image can be moved by clicking and dragging and zoomed by double clicking or using the mouse wheel.</p>
+
+<h2>Uses algorithms from </h2>
+<ul>
+    <li><a href="http://web.archive.org/web/20081014161121/http://www.colorjack.com/labs/colormatrix/" target="blank">http://www.colorjack.com/labs/colormatrix/</a> (web.archive link, because original source is gone)</li>
+    <li><a href="http://web.archive.org/web/20090318054431/http://www.nofunc.com/Color_Blindness_Library" target="blank">http://www.nofunc.com/Color_Blindness_Library</a> (web.archive link, because original source is gone)</li>
+</ul>
+<a href="http://kaioa.com/node/75#comment-247" target="blank">Comment</a> about the first algorithm:
+<blockquote>
+<p>You're right, the ColorMatrix version is very simplified, and not accurate. I created that color matrix one night (<a href="http://www.colorjack.com/labs/colormatrix/" target="blank">http://www.colorjack.com/labs/colormatrix/</a>) and since then it's shown up many places... I should probably take that page down before it spreads more! Anyways, it gives you an idea of what it might look like, but for the real thing...</p>
+<p>As far as a simple script to simulate color blindness, this one does the best job:</p>
+<p><a href="http://www.nofunc.com/Color_Blindness_Library/" target="blank">http://www.nofunc.com/Color_Blindness_Library/</a> - It uses "confusion lines" within the XYZ color space to calculate values (this one is in Javascript, and should be easy to convert to python).</p>
+<p>There are a few other methods, and no one really knows exactly what it would look like... these are all generalizations of a small sample, set against the masses.</p>
+</blockquote>
+
+Copyright Notice for the second non-commercial-Algorithm:
+<blockquote><pre>
+The Color Blind Simulation function is
+copyright (c) 2000-2001 by Matthew Wickline and the
+Human-Computer Interaction Resource Network ( http://hcirn.com/ ).
+
+It is used with the permission of Matthew Wickline and HCIRN,
+and is freely available for non-commercial use. For commercial use, please
+contact the Human-Computer Interaction Resource Network ( http://hcirn.com/ ).
+</pre></blockquote>
+        </div>
         <div class="container" style="">
             <div>
                 <input type="file" id="fileInput"/>
@@ -42,13 +85,13 @@
 <label for="radioColorblindTypeTritanomaly"><input type="radio" name="colorblindType" value="Tritanomaly" id="radioColorblindTypeTritanomaly"/>Tritanomaly</label>
 <label for="radioColorblindTypeAchromatopsia"><input type="radio" name="colorblindType" value="Achromatopsia" id="radioColorblindTypeAchromatopsia"/>Achromatopsia</label>
 <label for="radioColorblindTypeAchromatomaly"><input type="radio" name="colorblindType" value="Achromatomaly" id="radioColorblindTypeAchromatomaly"/>Achromatomaly</label>
-<label for="usehcirn"><input type="checkbox" name="hcirn" value="true" id="usehcirn">Use non-commercial Simulation</label>
+<label for="usehcirn"><input type="checkbox" name="hcirn" value="true" id="usehcirn">Use non-commercial-only algorithm</label>
             </div>
             <div>
                 <hr/>
             </div>
             <div style="height: 100%" id="canvasDiv">
-                <div id="dropNotification" style="display: none"><h1>Drop your image to load it</h1></div>
+                <div id="dropNotification" class="boxed" style="display: none"><h1>Drop your image to load it</h1></div>
                 <canvas id="outCanvas">Your Browser does not support &lt;canvas&gt;. Get an upgrade!</canvas>
             </div>
         </div>
@@ -85,6 +128,7 @@ fileInput.onchange = function (evt) {
 };
 
 function readFile(files) {
+    document.getElementById("aboutBox").style.display = "none";
     // FileReader support
     if (FileReader && files && files.length) {
         if (files.length !== 1) {
@@ -125,11 +169,11 @@ canvasDiv.addEventListener('drop', function (evt) {
 }, false);
 
 canvasDiv.addEventListener('dragover', function (evt) {
-    console.log("Dragover");
-  evt.stopPropagation();
-  evt.preventDefault();
-  dropNotification.style.display = "block";
-  evt.dataTransfer.dropEffect = 'copy'; // Explicitly show this is a copy.
+    document.getElementById("aboutBox").style.display = "none";
+    evt.stopPropagation();
+    evt.preventDefault();
+    dropNotification.style.display = "block";
+    evt.dataTransfer.dropEffect = 'copy'; // Explicitly show this is a copy.
 }, false);
 
 canvasDiv.addEventListener('dragleave', function (evt) {
