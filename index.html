@@ -86,6 +86,7 @@ contact the Human-Computer Interaction Resource Network ( http://hcirn.com/ ).
 <label for="radioColorblindTypeAchromatopsia"><input type="radio" name="colorblindType" value="Achromatopsia" id="radioColorblindTypeAchromatopsia"/>Achromatopsia</label>
 <label for="radioColorblindTypeAchromatomaly"><input type="radio" name="colorblindType" value="Achromatomaly" id="radioColorblindTypeAchromatomaly"/>Achromatomaly</label>
 <label for="usehcirn"><input type="checkbox" name="hcirn" value="true" id="usehcirn">Use non-commercial-only algorithm</label>
+<span id="loadingIndicator" style="display:none">&nbsp;Computing...</span>
             </div>
             <div>
                 <hr/>
@@ -99,14 +100,22 @@ contact the Human-Computer Interaction Resource Network ( http://hcirn.com/ ).
         <script src="hcirn_colorblind_simulation.js"></script>
         <script src="colorblind.js"></script>
         <script type="text/javascript">
+
+var loadingIndicator = document.getElementById('loadingIndicator');
 function filterOrImageChanged() {
     var type = document.querySelector('input[name = "colorblindType"]:checked').value;
     var usehcirn = document.getElementById("usehcirn").checked;
     var filterName = (usehcirn ? "hcirn" : "simpl") + type;
     console.log("filterOrImageChanged: " + filterName);
-    getFilteredImage(currentImage, filterName, function (filteredImage) {
-        panZoomImage.displayImage(filteredImage);
-    });
+    if (currentImage) {
+        loadingIndicator.style.display="inline";
+        setTimeout(function () {
+            getFilteredImage(currentImage, filterName, function (filteredImage) {
+                panZoomImage.displayImage(filteredImage);
+                loadingIndicator.style.display="none";
+            });
+        }, 0);
+    }
 }
 
 (function() {
