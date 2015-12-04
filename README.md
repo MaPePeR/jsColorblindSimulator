@@ -3,6 +3,8 @@
 Simulate different kinds of color-blindness on images directly in your webbrowser.
 All the processing is done locally and the images do not leave your computer.
 
+# Try it [here](http://mapeper.github.io/jsColorblindSimulator/)
+
 ## About this project
 This project is inspired by [Coblis - the Color BLIndness Simulator](http://www.color-blindness.com/coblis-color-blindness-simulator/).
 But instead of uploading the images to a server it does all the image processing locally in your webbrowser.
