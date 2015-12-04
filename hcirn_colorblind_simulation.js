@@ -46,7 +46,7 @@ powGammaLookup = Array(256);
 
 })();
 
-function blindMK(r,t) {
+function blindMK(rgb,t) {
     var gamma = 2.2, wx = 0.312713, wy = 0.329016, wz = 0.358271;
 
     function Color() {
@@ -54,7 +54,7 @@ function blindMK(r,t) {
          this.xyz_from_rgb = rgb2xyz;
      }
 
-    var b = r[2], g = r[1], r = r[0], c = new Color;
+    var b = rgb[2], g = rgb[1], r = rgb[0];
 
     c.r = powGammaLookup[r];
     c.g = powGammaLookup[g];
