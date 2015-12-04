@@ -1,0 +1,97 @@
+<html>
+    <head>
+        <style type="text/css">
+            #outputDiv canvas {
+                width: 100%;
+                height: 100%;
+            }
+            .container {
+                display: table;
+                width:100%;
+                height:100%
+            }
+            .container div {
+                display: table-row;
+            }
+
+        </style>
+        <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+        <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>-->
+    </head>
+    <body>
+        <div class="container" style="">
+            <div>
+                <input type="file" id="fileInput"/><img id="testImage" src="http://www.html5rocks.com/en/tutorials/canvas/imagefilters/demo_small.png" style="display:none"/>
+                <div id="filterSelecion">
+<input type="radio" name="colorblindType" value="Normal" id="radioColorblindTypeNormal" checked><label for="radioColorblindTypeNormal">Normal
+<input type="radio" name="colorblindType" value="Protanopia" id="radioColorblindTypeProtanopia"><label for="radioColorblindTypeProtanopia">Protanopia
+<input type="radio" name="colorblindType" value="Protanomaly" id="radioColorblindTypeProtanomaly"><label for="radioColorblindTypeProtanomaly">Protanomaly
+<input type="radio" name="colorblindType" value="Deuteranopia" id="radioColorblindTypeDeuteranopia"><label for="radioColorblindTypeDeuteranopia">Deuteranopia
+<input type="radio" name="colorblindType" value="Deuteranomaly" id="radioColorblindTypeDeuteranomaly"><label for="radioColorblindTypeDeuteranomaly">Deuteranomaly
+<input type="radio" name="colorblindType" value="Tritanopia" id="radioColorblindTypeTritanopia"><label for="radioColorblindTypeTritanopia">Tritanopia
+<input type="radio" name="colorblindType" value="Tritanomaly" id="radioColorblindTypeTritanomaly"><label for="radioColorblindTypeTritanomaly">Tritanomaly
+<input type="radio" name="colorblindType" value="Achromatopsia" id="radioColorblindTypeAchromatopsia"><label for="radioColorblindTypeAchromatopsia">Achromatopsia
+<input type="radio" name="colorblindType" value="Achromatomaly" id="radioColorblindTypeAchromatomaly"><label for="radioColorblindTypeAchromatomaly">Achromatomaly
+<label for="usehcirn"><input type="checkbox" name="hcirn" value="true" id="usehcirn">Use non-commercial Simulation</label>
+                </div>
+            </div>
+            <div>
+                <hr/>
+            </div>
+            <div style="height: 100%">
+                <canvas id="outCanvas">Your Browser does not support &lt;canvas&gt;. Get an upgrade!</canvas>
+            </div>
+        </div>
+        <script src="panZoomImage.js"></script>
+        <script src="hcirn_colorblind_simulation.js"></script>
+        <script src="colorblind.js"></script>
+        <script type="text/javascript">
+function filterOrImageChanged() {
+    var type = document.querySelector('input[name = "colorblindType"]:checked').value;
+    var usehcirn = document.getElementById("usehcirn").checked;
+    var filterName = (usehcirn ? "hcirn" : "simpl") + type;
+    console.log("filterOrImageChanged: " + filterName);
+    getFilteredImage(currentImage, filterName, function (filteredImage) {
+        panZoomImage.displayImage(filteredImage);
+    });
+}
+
+(function() {
+    var radios = document.querySelectorAll('input[name = "colorblindType"]');
+    var i;
+    for (i = 0; i < radios.length; i++) {
+        radios[i].onclick = filterOrImageChanged;
+    }
+    document.getElementById("usehcirn").onclick = filterOrImageChanged;
+})();
+
+//Based on http://stackoverflow.com/a/3814285/2256700
+var fileInput = document.getElementById('fileInput');
+var currentImage;
+fileInput.onchange = function (evt) {
+    var tgt = evt.target || window.event.srcElement,
+        files = tgt.files;
+        // FileReader support
+        if (FileReader && files && files.length) {
+            var fr = new FileReader();
+            fr.onload = function () {
+                var img = new Image();
+                img.onload = function () {
+                    //createFilteredImage(this);
+                    currentImage = this;
+                    clearImageCache();
+                    filterOrImageChanged();
+                };
+                img.src = fr.result;
+            };
+            fr.readAsDataURL(files[0]);
+        }
+        // Not supported
+        else {
+            alert("Your Browser does not support the required Features.");
+        }
+};
+        </script>
+    </body>
+</html>
