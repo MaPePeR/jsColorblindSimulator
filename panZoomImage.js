@@ -20,9 +20,8 @@ window.onresize = function () {
     panZoomImage.onresize();
 };
 panZoomImage.redraw = function redraw(argument) {
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
     if (this.currentImage) {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.ctx.drawImage(this.currentImage,
             0, 0, this.currentImage.width, this.currentImage.height,
             this.translateX, this.translateY,
