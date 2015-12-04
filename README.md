@@ -22,7 +22,7 @@ like, but for the real thing...
 >
 > As far as a simple script to simulate color blindness, this one does the best job:
 >
-> [http://www.nofunc.com/Color_Blindness_Library/] — It uses "confusion lines" within the XYZ color space to calculate values (this one is in Javascript, and should be easy to convert to python).
+> http://www.nofunc.com/Color_Blindness_Library/ — It uses "confusion lines" within the XYZ color space to calculate values (this one is in Javascript, and should be easy to convert to python).
 >
 > There are a few other methods, and no one really knows exactly what it would look like... these are all generalizations of a small sample, set against the masses.
 
