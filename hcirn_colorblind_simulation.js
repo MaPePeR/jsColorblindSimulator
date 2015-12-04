@@ -47,55 +47,65 @@ powGammaLookup = Array(256);
 })();
 
 function blindMK(rgb,t) {
-    var gamma = 2.2, wx = 0.312713, wy = 0.329016, wz = 0.358271;
+    var gamma = 2.2;
+    var wx = 0.312713;
+    var wy = 0.329016;
+    var wz = 0.358271;
 
-    function Color() {
-         this.rgb_from_xyz = xyz2rgb;
-         this.xyz_from_rgb = rgb2xyz;
-     }
+    var b = rgb[2];
+    var g = rgb[1];
+    var r = rgb[0];
 
-    var b = rgb[2], g = rgb[1], r = rgb[0];
+    var cr = powGammaLookup[r];
+    var cg = powGammaLookup[g];
+    var cb = powGammaLookup[b];
+    // rgb -> xyz
+    var cx = (0.430574 * cr + 0.341550 * cg + 0.178325 * cb);
+    var cy = (0.222015 * cr + 0.706655 * cg + 0.071330 * cb);
+    var cz = (0.020183 * cr + 0.129553 * cg + 0.939180 * cb);
 
-    c.r = powGammaLookup[r];
-    c.g = powGammaLookup[g];
-    c.b = powGammaLookup[b];
-    c.xyz_from_rgb();
-
-    var sum_xyz = c.x + c.y + c.z;
-    c.u = 0; c.v = 0;
+    var sum_xyz = cx + cy + cz;
+    var cu = 0;
+    var cv = 0;
 
     if (sum_xyz != 0) {
-        c.u = c.x / sum_xyz;
-        c.v = c.y / sum_xyz;
+        cu = cx / sum_xyz;
+        cv = cy / sum_xyz;
     }
 
-    var nx = wx * c.y / wy,
-        nz = wz * c.y / wy,
-        clm,
-        s = new Color(),
-        d = new Color();
-    d.y = 0;
+    var nx = wx * cy / wy;
+    var nz = wz * cy / wy;
+    var clm;
+    var dy = 0;
 
-    if (c.u < rBlind[t].cpu) {
-        clm = (rBlind[t].cpv - c.v) / (rBlind[t].cpu - c.u);
+    if (cu < rBlind[t].cpu) {
+        clm = (rBlind[t].cpv - cv) / (rBlind[t].cpu - cu);
     } else {
-        clm = (c.v - rBlind[t].cpv) / (c.u - rBlind[t].cpu);
+        clm = (cv - rBlind[t].cpv) / (cu - rBlind[t].cpu);
     }
 
-    var clyi = c.v - c.u * clm; d.u = (rBlind[t].ayi - clyi) / (clm - rBlind[t].am);
-    d.v = (clm * d.u) + clyi;
+    var clyi = cv - cu * clm;
+    var du = (rBlind[t].ayi - clyi) / (clm - rBlind[t].am);
+    var dv = (clm * du) + clyi;
 
-    s.x = d.u * c.y / d.v; s.y = c.y;
-    s.z = (1 - (d.u + d.v)) * c.y / d.v;
-    s.rgb_from_xyz();
+    var sx = du * cy / dv;
+    var sy = cy;
+    var sz = (1 - (du + dv)) * cy / dv;
+    // xzy->rgb
+    var sr =  (3.063218 * sx - 1.393325 * sy - 0.475802 * sz);
+    var sg = (-0.969243 * sx + 1.875966 * sy + 0.041555 * sz);
+    var sb =  (0.067871 * sx - 0.228834 * sy + 1.069251 * sz);
 
-    d.x = nx - s.x;
-    d.z = nz - s.z;
-    d.rgb_from_xyz();
+    var dx = nx - sx;
+    var dz = nz - sz;
+    // xzy->rgb
+    dr =  (3.063218 * dx - 1.393325 * dy - 0.475802 * dz);
+    dg = (-0.969243 * dx + 1.875966 * dy + 0.041555 * dz);
+    db =  (0.067871 * dx - 0.228834 * dy + 1.069251 * dz);
 
-    var adjr = d.r ? ((s.r < 0 ? 0 : 1) - s.r) / d.r : 0,
-        adjg = d.g ? ((s.g < 0 ? 0 : 1) - s.g) / d.g : 0,
-        adjb = d.b ? ((s.b < 0 ? 0 : 1) - s.b) / d.b : 0;
+    var adjr = dr ? ((sr < 0 ? 0 : 1) - sr) / dr : 0;
+    var adjg = dg ? ((sg < 0 ? 0 : 1) - sg) / dg : 0;
+    var adjb = db ? ((sb < 0 ? 0 : 1) - sb) / db : 0;
 
     var adjust = Math.max(
         ((adjr > 1 || adjr < 0) ? 0 : adjr),
@@ -103,36 +113,16 @@ function blindMK(rgb,t) {
         ((adjb > 1 || adjb < 0) ? 0 : adjb)
     );
 
-    s.r = s.r + (adjust * d.r);
-    s.g = s.g + (adjust * d.g);
-    s.b = s.b + (adjust * d.b);
+    sr = sr + (adjust * dr);
+    sg = sg + (adjust * dg);
+    sb = sb + (adjust * db);
 
-    function z(v) {
-        return (255 * (v <= 0 ? 0 : v >= 1 ? 1 : Math.pow(v, 1 / gamma)));
-    }
-
-    return ([z(s.r),z(s.g),z(s.b)]);
+    return ([inversePow(sr),inversePow(sg),inversePow(sb)]);
 
 }
 
-function rgb2xyz() {
-
-    this.x = (0.430574 * this.r + 0.341550 * this.g + 0.178325 * this.b);
-    this.y = (0.222015 * this.r + 0.706655 * this.g + 0.071330 * this.b);
-    this.z = (0.020183 * this.r + 0.129553 * this.g + 0.939180 * this.b);
-
-    return this;
-
-}
-
-function xyz2rgb() {
-
-    this.r =  (3.063218 * this.x - 1.393325 * this.y - 0.475802 * this.z);
-    this.g = (-0.969243 * this.x + 1.875966 * this.y + 0.041555 * this.z);
-    this.b =  (0.067871 * this.x - 0.228834 * this.y + 1.069251 * this.z);
-
-    return this;
-
+function inversePow(v) {
+    return (255 * (v <= 0 ? 0 : v >= 1 ? 1 : Math.pow(v, 1 / 2.2)));
 }
 
 function anomylize(a,b) {
