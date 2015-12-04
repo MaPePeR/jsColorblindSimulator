@@ -1,4 +1,5 @@
 // Code grabbed from http://web.archive.org/web/20090318054431/http://www.nofunc.com/Color_Blindness_Library
+// Added 2 missing } to fix code.
 /*
 
 This function allows you to see what colors look like to those who are color blind.
@@ -21,6 +22,7 @@ Use the fBlind[] in order to convert. For instance: fBlind['Tritanomaly'](RGB) w
 var rBlind={'protan':{'cpu':0.735,'cpv':0.265,'am':1.273463,'ayi':-0.073894},
             'deutan':{'cpu':1.14,'cpv':-0.14,'am':0.968437,'ayi':0.003331},
             'tritan':{'cpu':0.171,'cpv':-0.003,'am':0.062921,'ayi':0.292119};
+            'tritan':{'cpu':0.171,'cpv':-0.003,'am':0.062921,'ayi':0.292119}};
 
 var fBlind={'Normal':function(v) { return(v); },
             'Protanopia':function(v) { return(blindMK(v,'protan')); },
@@ -31,6 +33,7 @@ var fBlind={'Normal':function(v) { return(v); },
             'Tritanomaly':function(v) { return(anomylize(v,blindMK(v,'tritan'))); },
             'Achromatopsia':function(v) { return(monochrome(v)); },
             'Achromatomaly':function(v) { return(anomylize(v,monochrome(v))); };
+            'Achromatomaly':function(v) { return(anomylize(v,monochrome(v))); }};
 
 function blindMK(r,t) { var gamma=2.2, wx=0.312713, wy=0.329016, wz=0.358271;
 
