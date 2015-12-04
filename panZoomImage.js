@@ -63,7 +63,7 @@ panZoomImage.zoom = function (clicks) {
 panZoomImage.canvas.addEventListener('mouseup', function (evt) {
     panZoomImage.dragStart = null;
     if (!panZoomImage.dragged) {
-        panZoomImage.zoom(evt.shiftKey ? 1 : -1);
+        panZoomImage.zoom(evt.shiftKey ? -1 : 1);
     }
 }, false);
 
