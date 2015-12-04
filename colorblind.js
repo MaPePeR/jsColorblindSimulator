@@ -53,11 +53,12 @@ function getFilteredImage(img, type, callback) {
     console.log("getFilteredImage")
     if (type in imageCache) {
         callback(imageCache[type]);
+    } else {
+        var filtered = createFilteredImage(img, type, function (filtered) {
+            imageCache[type] = filtered;
+            callback(filtered);
+        });
     }
-    var filtered = createFilteredImage(img, type, function (filtered) {
-        imageCache[type] = filtered;
-        callback(filtered);
-    });
 }
 
 function createFilteredImage(img, type, callback) {
