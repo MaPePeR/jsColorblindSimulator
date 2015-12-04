@@ -54,6 +54,7 @@
     <li><a href="http://web.archive.org/web/20081014161121/http://www.colorjack.com/labs/colormatrix/" target="blank">http://www.colorjack.com/labs/colormatrix/</a> (web.archive link, because original source is gone)</li>
     <li><a href="http://web.archive.org/web/20090318054431/http://www.nofunc.com/Color_Blindness_Library" target="blank">http://www.nofunc.com/Color_Blindness_Library</a> (web.archive link, because original source is gone)</li>
 </ul>
+<h3>No guarantees that these are actually good!</h3>
 <a href="http://kaioa.com/node/75#comment-247" target="blank">Comment</a> about the first algorithm:
 <blockquote>
 <p>You're right, the ColorMatrix version is very simplified, and not accurate. I created that color matrix one night (<a href="http://www.colorjack.com/labs/colormatrix/" target="blank">http://www.colorjack.com/labs/colormatrix/</a>) and since then it's shown up many places... I should probably take that page down before it spreads more! Anyways, it gives you an idea of what it might look like, but for the real thing...</p>
@@ -91,6 +92,7 @@ contact the Human-Computer Interaction Resource Network ( http://hcirn.com/ ).
 <label><input type="radio" name="lens" value="No" checked/>No Lens</label>
 <label><input type="radio" name="lens" value="Normal"/>Normal Lens</label>
 <label><input type="radio" name="lens" value="Inverse"/>Inverse Lens</label>
+&nbsp;<a href="#" target="blank" id="imageLink" style="display: none">Open simulated image in new window</a>
 <span id="loadingIndicator" style="display:none">&nbsp;Computing...</span>
             </div>
             <div>
@@ -115,7 +117,9 @@ function filterOrImageChanged() {
     if (currentImage) {
         loadingIndicator.style.display="inline";
         setTimeout(function () {
-            getFilteredImage(currentImage, filterName, function (filteredImage) {
+            getFilteredImage(currentImage, filterName, function (filteredImage, url) {
+                document.getElementById('imageLink').href = url;
+                document.getElementById('imageLink').style.display = "inline";
                 panZoomImage.displayImage(filteredImage);
                 loadingIndicator.style.display="none";
             });

@@ -45,18 +45,21 @@ for (var t in ColorMatrixMatrixes) {
 }
 
 var imageCache = {}
+var urlCache = {}
 function clearImageCache() {
     imageCache = {};
+    urlCache = {}
 }
 
 function getFilteredImage(img, type, callback) {
     console.log("getFilteredImage")
     if (type in imageCache) {
-        callback(imageCache[type]);
+        callback(imageCache[type], urlCache[type]);
     } else {
-        var filtered = createFilteredImage(img, type, function (filtered) {
+        var filtered = createFilteredImage(img, type, function (filtered, url) {
             imageCache[type] = filtered;
-            callback(filtered);
+            urlCache[type] = url;
+            callback(filtered, url);
         });
     }
 }
@@ -84,7 +87,7 @@ function createFilteredImage(img, type, callback) {
     console.log(url);
     var filteredImage = new Image();
     filteredImage.onload = function () {
-        callback(this);
+        callback(this, url);
     }
     filteredImage.src = url;
 }
