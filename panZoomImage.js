@@ -1,6 +1,6 @@
 // Inspired by http://phrogz.net/tmp/canvas_zoom_to_cursor.html
 panZoomImage = {canvas: document.getElementById('outCanvas'),
-    lastX: 0, lastY: 0, translateX: 0, translateY: 0, scale: 1.0, dragged: false};
+    lastX: 0, lastY: 0, translateX: 0, translateY: 0, scale: 1.0, dragged: false, lens: 0};
 panZoomImage.displayImage = function displayImage(img) {
     this.ctx = this.canvas.getContext('2d');
     this.currentImage = img;
@@ -26,10 +26,34 @@ window.onload = function () {
 panZoomImage.redraw = function redraw(argument) {
     if (this.currentImage) {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        this.ctx.drawImage(this.currentImage,
+
+        var lensImage, fullImage;
+        if (this.lens === 0) {
+            fullImage = this.currentImage;
+        } else if (this.lens === 1) {
+            fullImage = this.currentImage;
+            lensImage = currentImage;
+        } else if (this.lens === 2) {
+            fullImage = currentImage;
+            lensImage = this.currentImage;
+        }
+
+        this.ctx.drawImage(fullImage,
             0, 0, this.currentImage.width, this.currentImage.height,
             this.translateX, this.translateY,
             this.currentImage.width * this.scale, this.currentImage.height * this.scale);
+        if (this.lens ===  1 || this.lens === 2) {
+            this.ctx.save();
+            this.ctx.beginPath();
+            this.ctx.arc(this.lastX, this.lastY, 50, 0, 2 * Math.PI);
+            this.ctx.clip();
+            this.ctx.drawImage(lensImage,
+                    (this.lastX - this.translateX - 50) / this.scale, (this.lastY - this.translateY - 50) / this.scale,
+                    100 / this.scale, 100  / this.scale,
+                    this.lastX - 50, this.lastY - 50,
+                    100, 100);
+            this.ctx.restore();
+        }
     }
 };
 panZoomImage.canvas.addEventListener('mousedown', function (evt) {
@@ -46,10 +70,10 @@ panZoomImage.canvas.addEventListener('mousemove', function (evt) {
     if (panZoomImage.dragStart) {
         panZoomImage.translateX += thisX - panZoomImage.lastX;
         panZoomImage.translateY += thisY - panZoomImage.lastY;
-        panZoomImage.redraw();
     }
     panZoomImage.lastX = thisX;
     panZoomImage.lastY = thisY;
+    panZoomImage.redraw();
 }, false);
 panZoomImage.zoom = function (clicks) {
     var oldscale = this.scale;

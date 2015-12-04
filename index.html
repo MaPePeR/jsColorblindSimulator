@@ -87,6 +87,10 @@ contact the Human-Computer Interaction Resource Network ( http://hcirn.com/ ).
 <label><input type="radio" name="colorblindType" value="Achromatomaly"/>Achromatomaly</label>
 
 <label><input type="checkbox" name="hcirn" value="true" id="usehcirn">Use non-commercial-only algorithm</label>
+<br/>
+<label><input type="radio" name="lens" value="No" checked/>No Lens</label>
+<label><input type="radio" name="lens" value="Normal"/>Normal Lens</label>
+<label><input type="radio" name="lens" value="Inverse"/>Inverse Lens</label>
 <span id="loadingIndicator" style="display:none">&nbsp;Computing...</span>
             </div>
             <div>
@@ -119,11 +123,28 @@ function filterOrImageChanged() {
     }
 }
 
+function lensChanged() {
+    var v = document.querySelector('input[name = "lens"]:checked').value;
+    if (v === "No") {
+        panZoomImage.lens = 0;
+    } else if (v === "Normal") {
+        panZoomImage.lens = 1;
+    } else if (v === "Inverse") {
+        panZoomImage.lens = 2;
+    } else {
+        throw "Illegal Lens Type";
+    }
+    panZoomImage.redraw();
+}
 (function() {
     var radios = document.querySelectorAll('input[name = "colorblindType"]');
     var i;
     for (i = 0; i < radios.length; i++) {
         radios[i].onclick = filterOrImageChanged;
+    }
+    radios = document.querySelectorAll('input[name = "lens"]');
+    for (i = 0; i < radios.length; i++) {
+        radios[i].onclick = lensChanged;
     }
     document.getElementById("usehcirn").onclick = filterOrImageChanged;
 })();
