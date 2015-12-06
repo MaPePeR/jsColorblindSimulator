@@ -73,7 +73,7 @@ function createFilteredImage(img, type, callback) {
     canvas.setAttribute('height', h);
     var ctx = canvas.getContext('2d');
     ctx.drawImage(img, 0, 0);
-    var pixels = ctx.getImageData(0, 0, w, h);\
+    var pixels = ctx.getImageData(0, 0, w, h);
 
     //Split the work into 5 chunks
     var chunkSize = Math.max(pixels.data.length / 5, 1);
