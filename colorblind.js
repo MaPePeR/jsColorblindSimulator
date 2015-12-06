@@ -73,23 +73,38 @@ function createFilteredImage(img, type, callback) {
     canvas.setAttribute('height', h);
     var ctx = canvas.getContext('2d');
     ctx.drawImage(img, 0, 0);
-    var pixels = ctx.getImageData(0, 0, w, h);
-    var i;
-    for (i = 0; i < pixels.data.length; i+=4) {
-        rgb = [pixels.data[i], pixels.data[i + 1], pixels.data[i + 2]]
-        filteredRGB = filterFunction(rgb);
-        pixels.data[i    ] = filteredRGB[0];
-        pixels.data[i + 1] = filteredRGB[1];
-        pixels.data[i + 2] = filteredRGB[2];
-    }
-    ctx.putImageData(pixels, 0, 0);
-    var url = canvas.toDataURL();
-    console.log(url);
-    var filteredImage = new Image();
-    filteredImage.onload = function () {
-        callback(this, url);
-    }
-    filteredImage.src = url;
+    var pixels = ctx.getImageData(0, 0, w, h);\
+
+    //Split the work into 5 chunks
+    var chunkSize = Math.max(pixels.data.length / 5, 1);
+    var i = 0;
+    //Chain of setTimeout-calls, so the progressbar can render.
+    setTimeout(function doWork() {
+        var chunkEnd = Math.min(i + chunkSize, pixels.data.length);
+        for (; i < chunkEnd; i += 4) {
+            var rgb = [pixels.data[i], pixels.data[i + 1], pixels.data[i + 2]];
+            filteredRGB = filterFunction(rgb);
+            pixels.data[i    ] = filteredRGB[0];
+            pixels.data[i + 1] = filteredRGB[1];
+            pixels.data[i + 2] = filteredRGB[2];
+        }
+        // 20% is loading the image
+        NProgress.set(0.2 + 0.8 * (i / pixels.data.length));
+        if (i < pixels.data.length) {
+            setTimeout(doWork, 0); // Self reference
+        } else {
+            // Work is done
+            ctx.putImageData(pixels, 0, 0);
+            var url = canvas.toDataURL();
+            console.log(url);
+            var filteredImage = new Image();
+            filteredImage.onload = function () {
+                callback(this, url);
+            };
+            filteredImage.src = url;
+        }
+    }, 0);
+
 }
 
 function getFilterFunction(type) {

@@ -39,6 +39,8 @@
                 padding-right: 20px;
             }
         </style>
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/nprogress/0.2.0/nprogress.min.js'></script>
+        <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/nprogress/0.2.0/nprogress.min.css'/>
     </head>
     <body>
         <div id="aboutBox" class="boxed">
@@ -118,11 +120,13 @@ function filterOrImageChanged() {
     console.log("filterOrImageChanged: " + filterName);
     if (currentImage) {
         loadingIndicator.style.display="inline";
+        NProgress.set(0.2);
         setTimeout(function () {
             getFilteredImage(currentImage, filterName, function (filteredImage, url) {
                 document.getElementById('imageLink').href = url;
                 document.getElementById('imageLink').style.display = "inline";
                 panZoomImage.displayImage(filteredImage);
+                NProgress.done();
                 loadingIndicator.style.display="none";
             });
         }, 0);
@@ -176,6 +180,7 @@ function readFile(files) {
             alert("Was not an image file. :(");
             return;
         }
+        NProgress.set(0.0);
         var fr = new FileReader();
         fr.onload = function () {
             var img = new Image();
