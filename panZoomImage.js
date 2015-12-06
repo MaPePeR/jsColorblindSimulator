@@ -81,11 +81,9 @@ panZoomImage.zoom = function (clicks) {
     }
     var oldscale = this.scale;
     this.scale *= Math.pow(1.1, clicks);
-    var scalechange = this.scale - oldscale;
 
-    // TODO Fix this
-    this.translateX -=  (this.lastX - this.translateX) * (1 - (oldscale / this.scale));
-    this.translateY -=  (this.lastY - this.translateY) * (1 - (oldscale / this.scale));
+    this.translateX += (this.translateX - this.lastX) * (this.scale / oldscale - 1);
+    this.translateY += (this.translateY - this.lastY) * (this.scale / oldscale - 1);
     this.redraw();
 };
 panZoomImage.canvas.addEventListener('mouseup', function (evt) {
