@@ -45,7 +45,7 @@
 <a href="https://github.com/MaPePeR/jsColorblindSimulator"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"></a>
 <h1>jsColorblindSimulator</h1>
 <h2>Usage</h2>
-<p>Use the file selector in the top left or <strong>drag and drop</strong> an image here to load it. You will then be able to choose between different simulations for different kinds of color-blindness.</p>
+<p>Use the file selector in the top left, <strong>drag and drop</strong> or <strong>paste</strong> an image here to load it. You will then be able to choose between different simulations for different kinds of color-blindness.</p>
 <p>All processing is done locally in your web browser. The image will not leave your computer.</p>
 <p>The displayed image can be moved by clicking and dragging and zoomed by (shift-)double clicking or using the mouse wheel.</p>
 <p>The lens-feature allows you to see what the original image looked like in the region around your cursor. The inverse lens shows you the original image and the simulated image around your cursor.</p>
@@ -215,6 +215,23 @@ canvasDiv.addEventListener('dragover', function (evt) {
 canvasDiv.addEventListener('dragleave', function (evt) {
     dropNotification.style.display = "none";
 }, false);
+
+//Retrieve Image from Clipboard: http://stackoverflow.com/a/15369753/2256700
+document.onpaste = function (event) {
+    // use event.originalEvent.clipboard for newer chrome versions
+    var items = (event.clipboardData  || event.originalEvent.clipboardData).items;
+    // find pasted image among pasted items
+    var blob = null;
+    for (var i = 0; i < items.length; i++) {
+        if (items[i].type.indexOf("image") === 0) {
+            blob = items[i].getAsFile();
+        }
+    }
+    // load image if there is a pasted image
+    if (blob !== null) {
+        readFile([blob]);
+    }
+};
         </script>
     </body>
 </html>
