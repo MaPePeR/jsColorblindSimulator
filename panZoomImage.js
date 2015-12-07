@@ -20,12 +20,12 @@ panZoomImage.onresize = function () {
     this.canvas.height = this.canvas.offsetHeight;
     this.redraw();
 };
-window.onresize = function () {
+window.addEventListener('resize', function () {
     panZoomImage.onresize();
-};
-window.onload = function () {
+}, false);
+window.addEventListener('load', function () {
     panZoomImage.onresize();
-};
+}, false);
 // this.lens = 0 => No Lens
 // this.lens = 1 => Normal Lens
 // this.lens = 2 => Inverse Lens
