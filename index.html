@@ -120,6 +120,8 @@ function filterOrImageChanged() {
     console.log("filterOrImageChanged: " + filterName);
     if (currentImage) {
         loadingIndicator.style.display="inline";
+        panZoomImage.displayImage(currentImage);
+        panZoomImage.setHiddenLensImage(currentImage);
         NProgress.set(0.2);
         setTimeout(function () {
             getFilteredImage(currentImage, filterName, function (filteredImage, url) {

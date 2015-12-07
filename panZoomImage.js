@@ -7,6 +7,10 @@ panZoomImage.displayImage = function displayImage(img) {
     this.onresize();
     this.redraw();
 };
+panZoomImage.setHiddenLensImage = function setHiddenLensImage(img) {
+    this.hiddenLensImage = img;
+    this.redraw();
+};
 panZoomImage.onresize = function () {
     // Fill whole window canvas: http://stackoverflow.com/a/10215724/2256700
     this.canvas.style.width  = '100%';
@@ -22,38 +26,66 @@ window.onresize = function () {
 window.onload = function () {
     panZoomImage.onresize();
 };
+// this.lens = 0 => No Lens
+// this.lens = 1 => Normal Lens
+// this.lens = 2 => Inverse Lens
+panZoomImage.getFullImage = function getFullImage() {
+    return this.lens === 0 || this.lens === 1 ? this.currentImage : this.hiddenLensImage;
+};
+panZoomImage.getLensImage = function getFullImage() {
+    return this.lens === 2 ? this.currentImage : this.hiddenLensImage;
+};
+panZoomImage.clearImage = function clearImage() {
+    if (this.currentImage) {
+        this.ctx.clearRect(
+            this.translateX, this.translateY,
+            this.scale * this.currentImage.width, this.scale * this.currentImage.height);
+    }
+};
+panZoomImage.drawImageAndLens = function drawImageAndLens() {
+    if (!this.currentImage) {
+        return;
+    }
+    var lensImage = this.getLensImage();
+    var fullImage = this.getFullImage();
+    this.ctx.drawImage(fullImage,
+        0, 0, this.currentImage.width, this.currentImage.height,
+        this.translateX, this.translateY,
+        this.currentImage.width * this.scale, this.currentImage.height * this.scale);
+    if (this.lens ===  1 || this.lens === 2) {
+        this.drawLens();
+    }
+};
+panZoomImage.clearLens = function clearLens() {
+    if (!this.currentImage) {
+        return;
+    }
 
-panZoomImage.redraw = function redraw(argument) {
+    this.ctx.drawImage(this.getFullImage(),
+            (this.lastX - this.translateX - 50) / this.scale, (this.lastY - this.translateY - 50) / this.scale,
+            100 / this.scale, 100  / this.scale,
+            this.lastX - 50, this.lastY - 50,
+            100, 100);
+};
+panZoomImage.drawLens = function drawLens() {
+    if (!this.currentImage || this.lens === 0) {
+        return;
+    }
+    this.ctx.save();
+    this.ctx.beginPath();
+    this.ctx.arc(this.lastX, this.lastY, 50, 0, 2 * Math.PI);
+    this.ctx.clip();
+    this.ctx.drawImage(this.getLensImage(),
+            (this.lastX - this.translateX - 50) / this.scale, (this.lastY - this.translateY - 50) / this.scale,
+            100 / this.scale, 100  / this.scale,
+            this.lastX - 50, this.lastY - 50,
+            100, 100);
+    this.ctx.restore();
+};
+panZoomImage.redraw = function redraw() {
     if (this.currentImage) {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
-        var lensImage, fullImage;
-        if (this.lens === 0) {
-            fullImage = this.currentImage;
-        } else if (this.lens === 1) {
-            fullImage = this.currentImage;
-            lensImage = currentImage;
-        } else if (this.lens === 2) {
-            fullImage = currentImage;
-            lensImage = this.currentImage;
-        }
-
-        this.ctx.drawImage(fullImage,
-            0, 0, this.currentImage.width, this.currentImage.height,
-            this.translateX, this.translateY,
-            this.currentImage.width * this.scale, this.currentImage.height * this.scale);
-        if (this.lens ===  1 || this.lens === 2) {
-            this.ctx.save();
-            this.ctx.beginPath();
-            this.ctx.arc(this.lastX, this.lastY, 50, 0, 2 * Math.PI);
-            this.ctx.clip();
-            this.ctx.drawImage(lensImage,
-                    (this.lastX - this.translateX - 50) / this.scale, (this.lastY - this.translateY - 50) / this.scale,
-                    100 / this.scale, 100  / this.scale,
-                    this.lastX - 50, this.lastY - 50,
-                    100, 100);
-            this.ctx.restore();
-        }
+        this.drawImageAndLens();
     }
 };
 panZoomImage.canvas.addEventListener('mousedown', function (evt) {
@@ -68,23 +100,32 @@ panZoomImage.canvas.addEventListener('mousemove', function (evt) {
     var thisY = evt.offsetY || (evt.pageY - panZoomImage.canvas.offsetTop);
     panZoomImage.dragged = true;
     if (panZoomImage.dragStart) {
+        panZoomImage.clearImage();
         panZoomImage.translateX += thisX - panZoomImage.lastX;
         panZoomImage.translateY += thisY - panZoomImage.lastY;
+        panZoomImage.drawImageAndLens();
+    } else {
+        panZoomImage.clearLens();
     }
     panZoomImage.lastX = thisX;
     panZoomImage.lastY = thisY;
-    panZoomImage.redraw();
+    if (!panZoomImage.dragStart) {
+        panZoomImage.drawLens();
+    }
+
 }, false);
 panZoomImage.zoom = function (clicks) {
     if (!this.currentImage) {
         return;
     }
+    this.clearImage();
+
     var oldscale = this.scale;
     this.scale *= Math.pow(1.1, clicks);
 
     this.translateX += (this.translateX - this.lastX) * (this.scale / oldscale - 1);
     this.translateY += (this.translateY - this.lastY) * (this.scale / oldscale - 1);
-    this.redraw();
+    this.drawImageAndLens();
 };
 panZoomImage.canvas.addEventListener('mouseup', function (evt) {
     panZoomImage.dragStart = null;
