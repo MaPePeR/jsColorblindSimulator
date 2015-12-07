@@ -85,11 +85,17 @@ function getFilteredImage(img, type, callback) {
     if (type in imageCache) {
         callback(imageCache[type], urlCache[type]);
     } else {
-        var filtered = createFilteredImage(img, type, function (filtered, url) {
-            imageCache[type] = filtered;
-            urlCache[type] = url;
-            callback(filtered, url);
-        });
+        if (type === 'hcirnNormal' || type === 'simplNormal') {
+            imageCache[type] = img;
+            urlCache[type] = '#';
+            callback(img, '#');
+        } else {
+            var filtered = createFilteredImage(img, type, function (filtered, url) {
+                imageCache[type] = filtered;
+                urlCache[type] = url;
+                callback(filtered, url);
+            });
+        }
     }
 }
 

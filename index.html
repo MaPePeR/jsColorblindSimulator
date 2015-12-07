@@ -118,15 +118,15 @@ function filterOrImageChanged() {
     var usehcirn = document.getElementById("usehcirn").checked;
     var filterName = (usehcirn ? "hcirn" : "simpl") + type;
     console.log("filterOrImageChanged: " + filterName);
+
+    document.getElementById('imageLink').style.display = type === "Normal" ? "none" : "inline";
+
     if (currentImage) {
         loadingIndicator.style.display="inline";
-        panZoomImage.displayImage(currentImage);
-        panZoomImage.setHiddenLensImage(currentImage);
         NProgress.set(0.2);
         setTimeout(function () {
             getFilteredImage(currentImage, filterName, function (filteredImage, url) {
                 document.getElementById('imageLink').href = url;
-                document.getElementById('imageLink').style.display = "inline";
                 panZoomImage.displayImage(filteredImage);
                 NProgress.done();
                 loadingIndicator.style.display="none";
@@ -189,6 +189,7 @@ function readFile(files) {
             img.onload = function () {
                 //createFilteredImage(this);
                 currentImage = this;
+                panZoomImage.setHiddenLensImage(currentImage);
                 clearImageCache();
                 filterOrImageChanged();
             };
