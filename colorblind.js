@@ -112,7 +112,7 @@ function createFilteredImage(img, type, callback) {
     var pixels = ctx.getImageData(0, 0, w, h);
 
     // Split the work into 5 chunks
-    var chunkSize = Math.max(pixels.data.length / 5, 1);
+    var chunkSize = Math.max(Math.floor(pixels.data.length / 5), 1);
     var i = 0;
     // Chain of setTimeout-calls, so the progressbar can render.
     setTimeout(function doWork() {
