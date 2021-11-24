@@ -85,7 +85,7 @@ function getFilteredImage(img, type, callback) {
     if (type in imageCache) {
         callback(imageCache[type], urlCache[type]);
     } else {
-        if (type === 'hcirnNormal' || type === 'simplNormal') {
+        if (type === 'hcirnNormal' || type === 'simplNormal' || type === 'brettNormal') {
             imageCache[type] = img;
             urlCache[type] = '#';
             callback(img, '#');
@@ -149,6 +149,8 @@ function getFilterFunction(type) {
         lib = fBlind;
     } else if (type.substring(0, 5) === 'simpl') {
         lib = colorMatrixFilterFunctions;
+    } else if (type.substring(0, 5) === 'brett') {
+        lib = brettelFunctions;
     } else {
         throw 'Invalid Filter Type!';
     }

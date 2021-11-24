@@ -90,7 +90,11 @@ contact the Human-Computer Interaction Resource Network ( http://hcirn.com/ ).
 <label><input type="radio" name="colorblindType" value="Achromatopsia"/>Achromatopsia</label>
 <label><input type="radio" name="colorblindType" value="Achromatomaly"/>Achromatomaly</label>
 
-<label><input type="checkbox" name="hcirn" value="true" id="usehcirn">Use non-commercial-only algorithm</label>
+<select id="method">
+    <option value="simpl">Simple (ColorMatrix)</option>
+    <option value="hcirn">Non-commercial-only (HCIRN)</option>
+    <option value="brett">Accurate (Brettel et al.) </option>
+</select>
 <br/>
 <label><input type="radio" name="lens" value="No" checked/>No Lens</label>
 <label><input type="radio" name="lens" value="Normal"/>Normal Lens</label>
@@ -108,15 +112,17 @@ contact the Human-Computer Interaction Resource Network ( http://hcirn.com/ ).
             </div>
         </div>
         <script src="panZoomImage.js"></script>
+        <script src="brettel_colorblind_simulation.js"></script>
         <script src="hcirn_colorblind_simulation.js"></script>
         <script src="colorblind.js"></script>
         <script type="text/javascript">
 
 var loadingIndicator = document.getElementById('loadingIndicator');
 function filterOrImageChanged() {
+    
     var type = document.querySelector('input[name = "colorblindType"]:checked').value;
-    var usehcirn = document.getElementById("usehcirn").checked;
-    var filterName = (usehcirn ? "hcirn" : "simpl") + type;
+    var method = document.querySelector('#method option:checked').value;
+    var filterName = method + type;
     console.log("filterOrImageChanged: " + filterName);
 
     document.getElementById('imageLink').style.display = type === "Normal" ? "none" : "inline";
@@ -158,7 +164,7 @@ function lensChanged() {
     for (i = 0; i < radios.length; i++) {
         radios[i].onclick = lensChanged;
     }
-    document.getElementById("usehcirn").onclick = filterOrImageChanged;
+    document.getElementById("method").onchange = filterOrImageChanged;
 })();
 
 //Based on http://stackoverflow.com/a/3814285/2256700
