@@ -36,41 +36,49 @@ var sRGB_to_linearRGB_Lookup = Array(256);
 
 })();
 
-var LMS_from_linearRGB = Array(
-    0.17886, 0.43997, 0.03597,
-    0.03380, 0.27515, 0.03621,
-    0.00031, 0.00192, 0.01528
-);
-
-var linearRGB_from_LMS = Array(
-    8.00533, -12.88195, 11.68065,
-    -0.97821, 5.26945, -10.18300,
-    -0.04017, -0.39885, 66.48079
-);
-
 brettel_params = {
     protan: {
-        lmsElementToProject: 0, // only this LMS coordinate is affected for protan
-        projectionOnPlane1: [0.00000, 2.18394, -5.65554],
-        projectionOnPlane2: [0.00000, 2.16614, -5.30455],
-        separationPlaneNormal: [0.00000, 0.01751, -0.34516]
+        rgbCvdFromRgb_1: [
+            0.14510, 1.20165, -0.34675,
+            0.10447, 0.85316, 0.04237,
+            0.00429, -0.00603, 1.00174
+        ],
+        rgbCvdFromRgb_2: [
+            0.14115, 1.16782, -0.30897,
+            0.10495, 0.85730, 0.03776,
+            0.00431, -0.00586, 1.00155
+        ],
+        separationPlaneNormal: [ 0.00048, 0.00416, -0.00464 ]
     },
 
     deutan: {
-        lmsElementToProject: 1, // only this LMS coordinate is affected for protan
-        projectionOnPlane1: [0.46165, 0.00000, 2.44885],
-        projectionOnPlane2: [0.45789, 0.00000, 2.58960],
-        separationPlaneNormal: [-0.01751, 0.00000, 0.65480]
+        rgbCvdFromRgb_1: [
+            0.36198, 0.86755, -0.22953,
+            0.26099, 0.64512, 0.09389,
+           -0.01975, 0.02686, 0.99289,
+        ],
+        rgbCvdFromRgb_2: [
+            0.37009, 0.88540, -0.25549,
+            0.25767, 0.63782, 0.10451,
+           -0.01950, 0.02741, 0.99209,
+        ],
+        separationPlaneNormal: [ -0.00293, -0.00645, 0.00938 ]
     },
 
     tritan: {
-        lmsElementToProject: 2, // only this LMS coordinate is affected for protan
-        projectionOnPlane1: [-0.00213, 0.05477, 0.00000],
-        projectionOnPlane2: [-0.06195, 0.16826, 0.00000],
-        separationPlaneNormal: [0.34516, -0.65480, 0.00000]
+        rgbCvdFromRgb_1: [
+            1.01354, 0.14268, -0.15622,
+           -0.01181, 0.87561, 0.13619,
+            0.07707, 0.81208, 0.11085,
+        ],
+        rgbCvdFromRgb_2: [
+            0.93337, 0.19999, -0.13336,
+            0.05809, 0.82565, 0.11626,
+            -0.37923, 1.13825, 0.24098,
+        ],
+        separationPlaneNormal: [ 0.03960, -0.02831, -0.01129 ]
     },
 };
-
 
 function brettel(srgb, t, severity) {
     // Go from sRGB to linearRGB
@@ -79,35 +87,30 @@ function brettel(srgb, t, severity) {
     rgb[1] = sRGB_to_linearRGB_Lookup[srgb[1]]
     rgb[2] = sRGB_to_linearRGB_Lookup[srgb[2]]
     
-    // lms = LMS_from_linearRGB * rgb
-    var lms = Array(3);
-    lms[0] = LMS_from_linearRGB[0]*rgb[0] + LMS_from_linearRGB[1]*rgb[1] + LMS_from_linearRGB[2]*rgb[2];
-    lms[1] = LMS_from_linearRGB[3]*rgb[0] + LMS_from_linearRGB[4]*rgb[1] + LMS_from_linearRGB[5]*rgb[2];
-    lms[2] = LMS_from_linearRGB[6]*rgb[0] + LMS_from_linearRGB[7]*rgb[1] + LMS_from_linearRGB[8]*rgb[2];
-
     var params = brettel_params[t];
     var separationPlaneNormal = params['separationPlaneNormal'];
-    var projectionOnPlane1 = params['projectionOnPlane1'];
-    var projectionOnPlane2 = params['projectionOnPlane2'];
-    var lmsElementToProject = params['lmsElementToProject'];
+    var rgbCvdFromRgb_1 = params['rgbCvdFromRgb_1'];
+    var rgbCvdFromRgb_2 = params['rgbCvdFromRgb_2'];
 
     // Check on which plane we should project by comparing wih the separation plane normal.
-    var dotWithSepPlane = lms[0]*separationPlaneNormal[0] + lms[1]*separationPlaneNormal[1] + lms[2]*separationPlaneNormal[2];
-    var projectionOnPlane = (dotWithSepPlane >= 0 ? projectionOnPlane1 : projectionOnPlane2);
+    var dotWithSepPlane = rgb[0]*separationPlaneNormal[0] + rgb[1]*separationPlaneNormal[1] + rgb[2]*separationPlaneNormal[2];
+    var rgbCvdFromRgb = (dotWithSepPlane >= 0 ? rgbCvdFromRgb_1 : rgbCvdFromRgb_2);
 
-    // Project on the plane. Only one coordinate changes (the axis corresponding
-    // to the missing cone cells), so no need to perform a full 3x3 multiplication.
-    // The severity factor is implemented as a linear interpolation with the original value.
-    var projected_element = projectionOnPlane[0]*lms[0] + projectionOnPlane[1]*lms[1] + projectionOnPlane[2]*lms[2];
-    lms[lmsElementToProject] = (projected_element*severity) + (lms[lmsElementToProject]*(1.0-severity));
+    // Transform to the full dichromat projection plane.
+    var rgb_cvd = Array(3);
+    rgb_cvd[0] = rgbCvdFromRgb[0]*rgb[0] + rgbCvdFromRgb[1]*rgb[1] + rgbCvdFromRgb[2]*rgb[2];
+    rgb_cvd[1] = rgbCvdFromRgb[3]*rgb[0] + rgbCvdFromRgb[4]*rgb[1] + rgbCvdFromRgb[5]*rgb[2];
+    rgb_cvd[2] = rgbCvdFromRgb[6]*rgb[0] + rgbCvdFromRgb[7]*rgb[1] + rgbCvdFromRgb[8]*rgb[2];
 
-    // Go back to linear RGB
-    // rgb_cvd = linearRGB_from_LMS * lms
-    rgb[0] = linearRGB_from_LMS[0]*lms[0] + linearRGB_from_LMS[1]*lms[1] + linearRGB_from_LMS[2]*lms[2];    
-    rgb[1] = linearRGB_from_LMS[3]*lms[0] + linearRGB_from_LMS[4]*lms[1] + linearRGB_from_LMS[5]*lms[2];
-    rgb[2] = linearRGB_from_LMS[6]*lms[0] + linearRGB_from_LMS[7]*lms[1] + linearRGB_from_LMS[8]*lms[2];
+    // Apply the severity factor as a linear interpolation.
+    // It's the same to do it in the RGB space or in the LMS
+    // space since it's a linear transform.
+    rgb_cvd[0] = rgb_cvd[0]*severity + rgb[0]*(1.0-severity);
+    rgb_cvd[1] = rgb_cvd[1]*severity + rgb[1]*(1.0-severity);
+    rgb_cvd[2] = rgb_cvd[2]*severity + rgb[2]*(1.0-severity);
 
-    return ([sRGB_from_linearRGB(rgb[0]),sRGB_from_linearRGB(rgb[1]),sRGB_from_linearRGB(rgb[2])]);
+    // Go back to sRGB
+    return ([sRGB_from_linearRGB(rgb_cvd[0]),sRGB_from_linearRGB(rgb_cvd[1]),sRGB_from_linearRGB(rgb_cvd[2])]);
 }
 
 // Adjusted from the hcirn code
