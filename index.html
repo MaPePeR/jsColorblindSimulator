@@ -56,8 +56,9 @@
 <ul>
     <li><a href="http://web.archive.org/web/20081014161121/http://www.colorjack.com/labs/colormatrix/" target="blank">http://www.colorjack.com/labs/colormatrix/</a> (web.archive link, because original source is gone)</li>
     <li><a href="http://web.archive.org/web/20090318054431/http://www.nofunc.com/Color_Blindness_Library" target="blank">http://www.nofunc.com/Color_Blindness_Library</a> (web.archive link, because original source is gone)</li>
+    <li><a href="https://daltonlens.org#libdaltonlens" target="blank">libDaltonLens</a> (implementation of <a href="http://vision.psychol.cam.ac.uk/jdmollon/papers/Dichromatsimulation.pdf"><i>Computerized simulation of color appearance for dichromats</i></a> by Brettel et al.)</li>
 </ul>
-<h3>No guarantees that these are actually good!</h3>
+<h3>The first two algorithms have not been proven to be accurate.</h3>
 <a href="http://kaioa.com/node/75#comment-247" target="blank">Comment</a> about the first algorithm:
 <blockquote>
 <p>You're right, the ColorMatrix version is very simplified, and not accurate. I created that color matrix one night (<a href="http://www.colorjack.com/labs/colormatrix/" target="blank">http://www.colorjack.com/labs/colormatrix/</a>) and since then it's shown up many places... I should probably take that page down before it spreads more! Anyways, it gives you an idea of what it might look like, but for the real thing...</p>
@@ -76,6 +77,12 @@ It is used with the permission of Matthew Wickline and HCIRN,
 and is freely available for non-commercial use. For commercial use, please
 contact the Human-Computer Interaction Resource Network ( http://hcirn.com/ ).
 </pre></blockquote>
+
+Comment about the third algorithm:
+<blockquote><p>
+The Brettel et al. method was published in 1997 in the age of CRT monitors and has been adapted to modern sRGB monitors. It should be pretty accurate, at least for full dichromacy. Of course it is still an approximation and many factors make it imperfect, including an uncalibrated monitor, unknown lighting environment, and per-individual variations. In general it will tend to be accurate for small or thin objects (small dots, lines) and too strong for large bright areas, even for full dichromats.
+</p></blockquote>
+
         </div>
         <div class="container" style="">
             <div>
@@ -90,7 +97,11 @@ contact the Human-Computer Interaction Resource Network ( http://hcirn.com/ ).
 <label><input type="radio" name="colorblindType" value="Achromatopsia"/>Achromatopsia</label>
 <label><input type="radio" name="colorblindType" value="Achromatomaly"/>Achromatomaly</label>
 
-<label><input type="checkbox" name="hcirn" value="true" id="usehcirn">Use non-commercial-only algorithm</label>
+<select id="method">
+    <option value="simpl">Simple (ColorMatrix)</option>
+    <option value="hcirn">Non-commercial-only (HCIRN)</option>
+    <option value="brett">Accurate (Brettel et al.) </option>
+</select>
 <br/>
 <label><input type="radio" name="lens" value="No" checked/>No Lens</label>
 <label><input type="radio" name="lens" value="Normal"/>Normal Lens</label>
@@ -108,15 +119,17 @@ contact the Human-Computer Interaction Resource Network ( http://hcirn.com/ ).
             </div>
         </div>
         <script src="panZoomImage.js"></script>
+        <script src="brettel_colorblind_simulation.js"></script>
         <script src="hcirn_colorblind_simulation.js"></script>
         <script src="colorblind.js"></script>
         <script type="text/javascript">
 
 var loadingIndicator = document.getElementById('loadingIndicator');
 function filterOrImageChanged() {
+    
     var type = document.querySelector('input[name = "colorblindType"]:checked').value;
-    var usehcirn = document.getElementById("usehcirn").checked;
-    var filterName = (usehcirn ? "hcirn" : "simpl") + type;
+    var method = document.querySelector('#method option:checked').value;
+    var filterName = method + type;
     console.log("filterOrImageChanged: " + filterName);
 
     document.getElementById('imageLink').style.display = type === "Normal" ? "none" : "inline";
@@ -158,7 +171,7 @@ function lensChanged() {
     for (i = 0; i < radios.length; i++) {
         radios[i].onclick = lensChanged;
     }
-    document.getElementById("usehcirn").onclick = filterOrImageChanged;
+    document.getElementById("method").onchange = filterOrImageChanged;
 })();
 
 //Based on http://stackoverflow.com/a/3814285/2256700

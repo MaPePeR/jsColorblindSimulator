@@ -9,7 +9,7 @@ All the processing is done locally and the images do not leave your computer.
 This project is inspired by [Coblis - the Color BLIndness Simulator](http://www.color-blindness.com/coblis-color-blindness-simulator/).
 But instead of uploading the images to a server it does all the image processing locally in your webbrowser.
 
-You can choose between 2 different Simulation Algorithms *(Both are not proven to produce good or realistic results!)*:
+You can choose between 3 different Simulation Algorithms *(The first two are not proven to produce good or realistic results!)*:
 
 ##### The `ColorMatrix` Algorithm
 
@@ -36,3 +36,7 @@ From http://www.nofunc.com/Color_Blindness_Library/ [(web.archive)](http://web.a
     It is used with the permission of Matthew Wickline and HCIRN,
     and is freely available for non-commercial use. For commercial use, please
     contact the Human-Computer Interaction Resource Network ( http://hcirn.com/ ).
+
+##### The Brettel, Viénot and Mollon Simulation function
+
+This is an implementation of the research paper [_Computerized simulation of color appearance for dichromats_](http://vision.psychol.cam.ac.uk/jdmollon/papers/Dichromatsimulation.pdf) by Brettel, H., Viénot, F., & Mollon, J. D. (1997). It has been adapted to modern sRGB monitors and should be pretty accurate, at least for full dichromacy. Of course it is still an approximation though, many factors make it imperfect, such as uncalibrated monitor, unknown lighting environment, and per-individual variations. In general it will tend to be accurate for small or thin objects (small dots, lines) and too strong for large bright areas, even for full dichromats.
