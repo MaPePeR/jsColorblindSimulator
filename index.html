@@ -100,7 +100,7 @@ The Brettel et al. method was published in 1997 in the age of CRT monitors and h
 <select id="method">
     <option value="simpl">Simple (ColorMatrix)</option>
     <option value="hcirn">Non-commercial-only (HCIRN)</option>
-    <option value="brett">Accurate (Brettel et al.) </option>
+    <option value="brett" selected>Accurate (Brettel et al.) </option>
 </select>
 <br/>
 <label><input type="radio" name="lens" value="No" checked/>No Lens</label>
@@ -126,7 +126,7 @@ The Brettel et al. method was published in 1997 in the age of CRT monitors and h
 
 var loadingIndicator = document.getElementById('loadingIndicator');
 function filterOrImageChanged() {
-    
+
     var type = document.querySelector('input[name = "colorblindType"]:checked').value;
     var method = document.querySelector('#method option:checked').value;
     var filterName = method + type;
