@@ -85,7 +85,7 @@ function getFilteredImage(img, type, callback) {
     if (type in imageCache) {
         callback(imageCache[type], urlCache[type]);
     } else {
-        if (type === 'hcirnNormal' || type === 'simplNormal' || type === 'brettNormal') {
+        if (type === 'hcirnNormal' || type === 'simplNormal' || type === 'brettNormal' || type === 'machadoNormal') {
             imageCache[type] = img;
             urlCache[type] = '#';
             callback(img, '#');
@@ -151,6 +151,8 @@ function getFilterFunction(type) {
         lib = colorMatrixFilterFunctions;
     } else if (type.substring(0, 5) === 'brett') {
         lib = brettelFunctions;
+    } else if (type.substring(0, 5) === "macha") {
+        return getMachadoMatrix(type.substring(5), parseInt(document.getElementById('severity').value, 10));
     } else {
         throw 'Invalid Filter Type!';
     }

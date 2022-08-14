@@ -56,7 +56,8 @@
 <ul>
     <li><a href="http://web.archive.org/web/20081014161121/http://www.colorjack.com/labs/colormatrix/" target="blank">http://www.colorjack.com/labs/colormatrix/</a> (web.archive link, because original source is gone)</li>
     <li><a href="http://web.archive.org/web/20090318054431/http://www.nofunc.com/Color_Blindness_Library" target="blank">http://www.nofunc.com/Color_Blindness_Library</a> (web.archive link, because original source is gone)</li>
-    <li><a href="https://daltonlens.org#libdaltonlens" target="blank">libDaltonLens</a> (implementation of <a href="http://vision.psychol.cam.ac.uk/jdmollon/papers/Dichromatsimulation.pdf"><i>Computerized simulation of color appearance for dichromats</i></a> by Brettel et al.)</li>
+    <li><a href="https://daltonlens.org#libdaltonlens" target="blank">libDaltonLens</a> (implementation of <a href="http://vision.psychol.cam.ac.uk/jdmollon/papers/Dichromatsimulation.pdf"><i>Computerized simulation of color appearance for dichromats</i></a> by Brettel et al. 1997)</li>
+    <li>Implementation of <a href="https://www.inf.ufrgs.br/~oliveira/pubs_files/CVD_Simulation/CVD_Simulation.html" target="_blank"><i>A Physiologically-based Model for Simulation of Color Vision Deficiency</i></a> by Machado et al.</li>
 </ul>
 <h3>The first two algorithms have not been proven to be accurate.</h3>
 <a href="http://kaioa.com/node/75#comment-247" target="blank">Comment</a> about the first algorithm:
@@ -96,11 +97,13 @@ The Brettel et al. method was published in 1997 in the age of CRT monitors and h
 <label><input type="radio" name="colorblindType" value="Tritanomaly"/>Tritanomaly</label>
 <label><input type="radio" name="colorblindType" value="Achromatopsia"/>Achromatopsia</label>
 <label><input type="radio" name="colorblindType" value="Achromatomaly"/>Achromatomaly</label>
+<label style="margin-left: 1em;display: none;">Severity:<input type="range" min="0" max="100" value="50" class="slider" id="severity"></label>
 
 <select id="method">
     <option value="simpl">Simple (ColorMatrix)</option>
     <option value="hcirn">Non-commercial-only (HCIRN)</option>
-    <option value="brett" selected>Accurate (Brettel et al.) </option>
+    <option value="brett" selected>Accurate (Brettel et al. 1997)</option>
+    <option value="macha">Accurate (Machado et al. 2009)</option>
 </select>
 <br/>
 <label><input type="radio" name="lens" value="No" checked/>No Lens</label>
@@ -121,6 +124,7 @@ The Brettel et al. method was published in 1997 in the age of CRT monitors and h
         <script src="panZoomImage.js"></script>
         <script src="brettel_colorblind_simulation.js"></script>
         <script src="hcirn_colorblind_simulation.js"></script>
+        <script src="machado_colorblind_simulation.js"></script>
         <script src="colorblind.js"></script>
         <script type="text/javascript">
 
@@ -133,6 +137,15 @@ function filterOrImageChanged() {
     console.log("filterOrImageChanged: " + filterName);
 
     document.getElementById('imageLink').style.display = type === "Normal" ? "none" : "inline";
+    var isMachado = method == "macha";
+    document.getElementById('severity').parentElement.style.display = isMachado ? 'inline' : 'none';
+    ['Protanopia', 'Deuteranopia', 'Tritanopia', 'Achromatopsia', 'Achromatomaly'].forEach((item, i) => {
+        document.querySelector('input[type="radio"][value="' + item + '"]').parentElement.style.display = isMachado ? 'none' : 'inline';
+    });
+    if (method == 'macha' && type != "Normal") {
+        filterName += "_" + document.getElementById('severity').value
+    }
+
 
     if (currentImage) {
         loadingIndicator.style.display="inline";
@@ -172,6 +185,7 @@ function lensChanged() {
         radios[i].onclick = lensChanged;
     }
     document.getElementById("method").onchange = filterOrImageChanged;
+    document.getElementById("severity").onchange = filterOrImageChanged;
 })();
 
 //Based on http://stackoverflow.com/a/3814285/2256700
