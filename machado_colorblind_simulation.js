@@ -158,13 +158,13 @@ return function (type, severity) {
         matrix[8] = prevMatrix[8] * weightInv + nextMatrix[8] * weight;
     }
     return function(rgb) {
-        const r = rgb[0];
-        const g = rgb[1];
-        const b = rgb[2];
+        const r = sRGB_to_linearRGB_Lookup[rgb[0]];
+        const g = sRGB_to_linearRGB_Lookup[rgb[1]];
+        const b = sRGB_to_linearRGB_Lookup[rgb[2]];
         const result = [
-            matrix[0] * r + matrix[1] * g + matrix[2] * b,
-            matrix[3] * r + matrix[4] * g + matrix[5] * b,
-            matrix[6] * r + matrix[7] * g + matrix[8] * b,
+            sRGB_from_linearRGB(matrix[0] * r + matrix[1] * g + matrix[2] * b),
+            sRGB_from_linearRGB(matrix[3] * r + matrix[4] * g + matrix[5] * b),
+            sRGB_from_linearRGB(matrix[6] * r + matrix[7] * g + matrix[8] * b),
         ];
         return result;
 
